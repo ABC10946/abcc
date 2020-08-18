@@ -121,6 +121,7 @@ int main(int argc, char **argv) {
 	while (!at_eof()) {
 		if (consume('+')) {
 			printf("	add rax, %d\n", expect_number());
+			continue;
 		}
 
 		expect('-');
