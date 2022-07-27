@@ -11,7 +11,13 @@ typedef enum
     ND_SUB,
     ND_MUL,
     ND_DIV,
-    ND_NUM
+    ND_NUM,
+    ND_EQ,  // equal ==
+    ND_NEQ, // not equal !=
+    ND_LTE, // less than or equal <=
+    ND_GTE, // greater than or equal >=
+    ND_LT,  // less than <
+    ND_GT,  // greater than >
 } NodeKind;
 
 typedef struct Node Node;
@@ -35,6 +41,9 @@ Node *expr();
 Node *mul();
 Node *primary();
 Node *unary();
+Node *equality();
+Node *relational();
+Node *add();
 Node *new_node_num(int val);
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 
@@ -125,6 +134,59 @@ Node *mul() // トークンの長さ
 
 // expr = mul ("+" mul | "-" mul)*
 Node *expr()
+{
+    equality();
+}
+
+Node *equality()
+{
+    Node *node = relational();
+    for (;;)
+    {
+        if (consume("=="))
+        {
+            node = new_node(ND_EQ, node, relational());
+        }
+        else if (consume("!="))
+        {
+            node = new_node(ND_NEQ, node, relational());
+        }
+        else
+        {
+            return node;
+        }
+    }
+}
+
+Node *relational()
+{
+    Node *node = add();
+    for (;;)
+    {
+        if (consume("<"))
+        {
+            node = new_node(ND_LT, node, add());
+        }
+        else if (consume("<="))
+        {
+            node = new_node(ND_LTE, node, add());
+        }
+        else if (consume(">"))
+        {
+            node = new_node(ND_GT, node, add());
+        }
+        else if (consume(">="))
+        {
+            node = new_node(ND_GTE, node, add());
+        }
+        else
+        {
+            return node;
+        }
+    }
+}
+
+Node *add()
 {
     Node *node = mul();
     for (;;)
@@ -264,9 +326,10 @@ Token *tokenize(char *p)
             continue;
         }
 
-        if (strncmp(p, ">=", 2) == 0 || strncmp(p, "<=", 2) == 0 || strncmp(p, "==", 2) == 0)
+        if (strncmp(p, ">=", 2) == 0 || strncmp(p, "<=", 2) == 0 || strncmp(p, "==", 2) == 0 || strncmp(p, "!=", 2) == 0)
         {
-            cur = new_token(TK_RESERVED, cur, p += 2);
+            cur = new_token(TK_RESERVED, cur, p);
+            p += 2;
             cur->len = 2;
             continue;
         }
