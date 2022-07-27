@@ -1,85 +1,4 @@
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-typedef enum
-{
-    ND_ADD,
-    ND_SUB,
-    ND_MUL,
-    ND_DIV,
-    ND_NUM,
-    ND_EQ,  // equal ==
-    ND_NEQ, // not equal !=
-    ND_LTE, // less than or equal <=
-    ND_GTE, // greater than or equal >=
-    ND_LT,  // less than <
-    ND_GT,  // greater than >
-} NodeKind;
-
-typedef struct Node Node;
-
-struct Node
-{
-    NodeKind kind;
-    Node *lhs;
-    Node *rhs;
-    int val;
-};
-
-char *user_input;
-
-// プロトタイプ宣言
-bool consume(char *);
-void expect(char *);
-int expect_number();
-bool at_eof();
-Node *expr();
-Node *mul();
-Node *primary();
-Node *unary();
-Node *equality();
-Node *relational();
-Node *add();
-Node *new_node_num(int val);
-Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
-
-void error_at(char *loc, char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-
-    int pos = loc - user_input;
-    fprintf(stderr, "%s\n", user_input);
-    fprintf(stderr, "%*s", pos, " ");
-    fprintf(stderr, "^ ");
-    vfprintf(stderr, fmt, ap);
-    fprintf(stderr, "\n");
-    exit(1);
-}
-
-// トークンの種類を列挙型にする
-typedef enum
-{
-    TK_RESERVED, // 記号
-    TK_NUM,      // 整数
-    TK_EOF       // 終了
-} TokenKind;
-
-typedef struct Token Token;
-
-// トークン構造体
-struct Token
-{
-    TokenKind kind; // トークンの型 上で作った列挙型
-    Token *next;    // 次のトークンへのポインタ
-    int val;        // kindがTK_NUMのときの数値
-    char *str;      // トークン文字列
-    int len;        // トークンの長さ
-};
+#include "abcc.h"
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
@@ -220,77 +139,15 @@ Node *unary()
     return primary();
 }
 
-void gen(Node *node)
-{
-    if (node->kind == ND_NUM)
-    {
-        printf("	push %d\n", node->val);
-        return;
-    }
-
-    gen(node->lhs);
-    gen(node->rhs);
-
-    printf("	pop rdi\n");
-    printf("	pop rax\n");
-
-    switch (node->kind)
-    {
-    case ND_ADD:
-        printf("	add rax, rdi\n");
-        break;
-    case ND_SUB:
-        printf("	sub rax, rdi\n");
-        break;
-    case ND_MUL:
-        printf("	imul rax, rdi\n");
-        break;
-    case ND_DIV:
-        printf("	cqo\n");
-        printf("	idiv rdi\n");
-        break;
-    case ND_EQ:
-        printf("    cmp rax, rdi\n");
-        printf("    sete al\n");       // cmpで比較した結果2つの値が等しい場合ALに1をセットする
-        printf("    movzb rax, al\n"); // raxの上位56bitを0埋めする
-        break;
-    case ND_NEQ:
-        printf("    cmp rax, rdi\n");
-        printf("    setne al\n");      // cmpで比較した結果2つの値が等しくない場合ALに1をセットする
-        printf("    movzb rax, al\n"); // raxの上位56bitを0埋めする
-        break;
-    case ND_LT:
-        printf("    cmp rax, rdi\n");
-        printf("    setl al\n");       // cmpで比較した結果左辺の値が小さい場合ALに1をセットする
-        printf("    movzb rax, al\n"); // raxの上位56bitを0埋めする
-        break;
-    case ND_LTE:
-        printf("    cmp rax, rdi\n");
-        printf("    setle al\n");      // cmpで比較した結果左辺の値が小さいか等しい場合ALに1をセットする
-        printf("    movzb rax, al\n"); // raxの上位56bitを0埋めする
-        break;
-    case ND_GT:
-        printf("    cmp rdi, rax\n");
-        printf("    setl al\n");       // cmpで比較した結果左辺の値が大きい場合ALに1をセットする
-        printf("    movzb rax, al\n"); // raxの上位56bitを0埋めする
-        break;
-    case ND_GTE:
-        printf("    cmp rdi, rax\n");
-        printf("    setle al\n");      // cmpで比較した結果左辺の値が小さいか等しい場合ALに1をセットする
-        printf("    movzb rax, al\n"); // raxの上位56bitを0埋めする
-        break;
-    }
-
-    printf("	push rax\n");
-}
-
-// 今見てるトークン
-Token *token;
-
-void error(char *fmt, ...)
+void error_at(char *loc, char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
+
+    int pos = loc - user_input;
+    fprintf(stderr, "%s\n", user_input);
+    fprintf(stderr, "%*s", pos, " ");
+    fprintf(stderr, "^ ");
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
     exit(1);
@@ -383,27 +240,4 @@ Token *tokenize(char *p)
 
     new_token(TK_EOF, cur, p);
     return head.next;
-}
-
-int main(int argc, char **argv)
-{
-    if (argc != 2)
-    {
-        error("引数の個数が正しくありません\n");
-        return 1;
-    }
-
-    user_input = argv[1];
-    token = tokenize(user_input);
-    Node *node = expr();
-
-    printf(".intel_syntax noprefix\n");
-    printf(".global main\n");
-    printf("main:\n");
-
-    gen(node);
-
-    printf("	pop rax\n");
-    printf("	ret\n");
-    return 0;
 }
