@@ -28,7 +28,7 @@ char *user_input;
 
 // プロトタイプ宣言
 bool consume(char *);
-void expect(char);
+void expect(char *);
 int expect_number();
 bool at_eof();
 Node *expr();
@@ -94,7 +94,7 @@ Node *primary()
     if (consume("("))
     {
         Node *node = expr();
-        expect(')');
+        expect(")");
         return node;
     }
 
@@ -218,10 +218,10 @@ bool consume(char *op)
     return true;
 }
 
-void expect(char op)
+void expect(char *op)
 {
-    if (token->kind != TK_RESERVED || token->str[0] != op)
-        error_at(token->str, "'%c'ではありません", op);
+    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
+        error_at(token->str, "'%s'ではありません", op);
 
     token = token->next;
 }
@@ -264,7 +264,14 @@ Token *tokenize(char *p)
             continue;
         }
 
-        if (strchr("+-*/()", *p))
+        if (strncmp(p, ">=", 2) == 0 || strncmp(p, "<=", 2) == 0 || strncmp(p, "==", 2) == 0)
+        {
+            cur = new_token(TK_RESERVED, cur, p += 2);
+            cur->len = 2;
+            continue;
+        }
+
+        if (strchr("+-*/()<>", *p))
         {
             cur = new_token(TK_RESERVED, cur, p++);
             cur->len = 1;
@@ -302,20 +309,6 @@ int main(int argc, char **argv)
     printf("main:\n");
 
     gen(node);
-
-    /*
-    printf("	mov rax, %d\n", expect_number());
-
-    while (!at_eof()) {
-        if (consume('+')) {
-            printf("	add rax, %d\n", expect_number());
-            continue;
-        }
-
-        expect('-');
-        printf("	sub rax, %d\n", expect_number());
-    }
-    */
 
     printf("	pop rax\n");
     printf("	ret\n");
