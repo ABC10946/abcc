@@ -40,5 +40,7 @@ assert 0 "5 != 5"
 assert 0 "5 <= 2"
 assert 0 "2 > 5"
 assert 0 "5 < 2"
+assert 1 "(5==5) == (2==2)"
+assert 1 "(5 > 2) != (2!=2)"
 
 echo OK
