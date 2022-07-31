@@ -1,5 +1,8 @@
 #include "abcc.h"
 
+char *user_input;
+Token *token;
+
 void error(char *fmt, ...)
 {
     va_list ap;

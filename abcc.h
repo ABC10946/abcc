@@ -50,9 +50,9 @@ struct Token
     int len;        // トークンの長さ
 };
 
-char *user_input;
+extern char *user_input;
 // 今見てるトークン
-Token *token;
+extern Token *token;
 
 // プロトタイプ宣言
 bool consume(char *);
