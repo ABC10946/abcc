@@ -1,10 +1,36 @@
 #include "abcc.h"
 
+void gen_lval(Node *node)
+{
+    if (node->kind != ND_LVAR)
+    {
+        error("代入の左辺値が変数ではありません\n");
+    }
+    printf("\tmov rax, rbp\n");
+    printf("\tsub rax, %d\n", node->offset);
+    printf("\tpush rax\n");
+}
+
 void gen(Node *node)
 {
-    if (node->kind == ND_NUM)
+    switch (node->kind)
     {
+    case ND_NUM:
         printf("\tpush %d\n", node->val);
+        return;
+    case ND_LVAR:
+        gen_lval(node);
+        printf("\tpop rax\n");
+        printf("\tmov rax, [rax]\n");
+        printf("\tpush rax\n");
+        return;
+    case ND_ASSIGN:
+        gen_lval(node->lhs);
+        gen(node->rhs);
+        printf("\tpop rdi\n");
+        printf("\tpop rax\n");
+        printf("\tmov [rax], rdi\n");
+        printf("\tpush rdi\n");
         return;
     }
 

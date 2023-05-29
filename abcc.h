@@ -12,12 +12,14 @@ typedef enum
     ND_MUL,
     ND_DIV,
     ND_NUM,
-    ND_EQ,  // equal ==
-    ND_NEQ, // not equal !=
-    ND_LTE, // less than or equal <=
-    ND_GTE, // greater than or equal >=
-    ND_LT,  // less than <
-    ND_GT,  // greater than >
+    ND_EQ,     // equal ==
+    ND_NEQ,    // not equal !=
+    ND_LTE,    // less than or equal <=
+    ND_GTE,    // greater than or equal >=
+    ND_LT,     // less than <
+    ND_GT,     // greater than >
+    ND_ASSIGN, // 代入
+    ND_LVAR,   // ローカル変数
 } NodeKind;
 
 typedef struct Node Node;
@@ -28,12 +30,14 @@ struct Node
     Node *lhs;
     Node *rhs;
     int val;
+    int offset;
 };
 
 // トークンの種類を列挙型にする
 typedef enum
 {
     TK_RESERVED, // 記号
+    TK_IDENT,    // 識別子
     TK_NUM,      // 整数
     TK_EOF       // 終了
 } TokenKind;
@@ -53,6 +57,7 @@ struct Token
 extern char *user_input;
 // 今見てるトークン
 extern Token *token;
+extern Node *code[100];
 
 // プロトタイプ宣言
 bool consume(char *);
@@ -70,3 +75,5 @@ Node *new_node_num(int val);
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 void gen(Node *node);
 Token *tokenize(char *p);
+Token *consume_ident();
+void program();

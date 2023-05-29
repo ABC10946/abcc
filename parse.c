@@ -1,5 +1,36 @@
 #include "abcc.h"
 
+Node *code[100];
+
+Node *assign()
+{
+    Node *node = equality();
+    if (consume("="))
+        node = new_node(ND_ASSIGN, node, assign());
+    return node;
+}
+
+Node *expr()
+{
+    return assign();
+}
+
+Node *stmt()
+{
+    Node *node = expr();
+    expect(";");
+    return node;
+}
+
+void program()
+{
+    int i = 0;
+    while (!at_eof())
+        code[i++] = stmt();
+
+    code[i] = NULL;
+}
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
     Node *node = calloc(1, sizeof(Node));
@@ -19,6 +50,15 @@ Node *new_node_num(int val)
 
 Node *primary()
 {
+    Token *tok = consume_ident();
+    if (tok)
+    {
+        Node *node = calloc(1, sizeof(Node));
+        node->kind = ND_LVAR;
+        node->offset = (tok->str[0] - 'a' + 1) * 8;
+        return node;
+    }
+
     if (consume("("))
     {
         Node *node = expr();
@@ -51,11 +91,11 @@ Node *mul() // トークンの長さ
     }
 }
 
-// expr = mul ("+" mul | "-" mul)*
-Node *expr()
-{
-    equality();
-}
+// // expr = mul ("+" mul | "-" mul)*
+// Node *expr()
+// {
+//     equality();
+// }
 
 Node *equality()
 {
@@ -167,6 +207,17 @@ bool consume(char *op)
     return true;
 }
 
+Token *consume_ident()
+{
+    if (token->kind == TK_IDENT)
+    {
+        Token *t = token;
+        token = token->next; // トークンを読み進める
+        return t;
+    }
+    return NULL;
+}
+
 void expect(char *op)
 {
     if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
@@ -221,9 +272,16 @@ Token *tokenize(char *p)
             continue;
         }
 
-        if (strchr("+-*/()<>", *p))
+        if (strchr("+-*/()<>=;", *p))
         {
             cur = new_token(TK_RESERVED, cur, p++);
+            cur->len = 1;
+            continue;
+        }
+
+        if ('a' <= *p && *p <= 'z')
+        {
+            cur = new_token(TK_IDENT, cur, p++);
             cur->len = 1;
             continue;
         }
