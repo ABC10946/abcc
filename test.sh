@@ -45,5 +45,12 @@ assert 1 "(5 > 2) != (2!=2);"
 
 # assignテスト
 assert 5 "a=3+2;a;"
+assert 5 "foo = 3+2;foo;"
+
+assert 8 "a=3; b=5; a + b;"
+assert 8 "foo=3; bar = 5; foo + bar;"
+
 assert 5 "a = 3;b = 5 * 6 - 8;(a + b) / 5;"
+assert 5 "foo = 3; bar = 5 * 6 - 8; ( foo + bar) / 5;"
+
 echo OK

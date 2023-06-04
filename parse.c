@@ -1,6 +1,20 @@
 #include "abcc.h"
 
+typedef struct LVar LVar;
+
+struct LVar
+{
+    LVar *next;
+    char *name;
+    int len;
+    int offset;
+};
+
 Node *code[100];
+LVar *find_lvar(Token *tok);
+
+LVar *locals = NULL;
+// calloc(1, sizeof(LVar));
 
 Node *assign()
 {
@@ -55,7 +69,29 @@ Node *primary()
     {
         Node *node = calloc(1, sizeof(Node));
         node->kind = ND_LVAR;
-        node->offset = (tok->str[0] - 'a' + 1) * 8;
+
+        LVar *lvar = find_lvar(tok);
+        if (lvar)
+        {
+            node->offset = lvar->offset;
+        }
+        else
+        {
+            // localsがNULLの場合構造体を0埋めする。
+            if (locals == NULL)
+            {
+                locals = calloc(1, sizeof(LVar));
+            }
+
+            lvar = calloc(1, sizeof(LVar));
+            lvar->next = locals;
+            lvar->name = tok->str;
+            lvar->len = tok->len;
+            lvar->offset = locals->offset + 8;
+            node->offset = lvar->offset;
+            locals = lvar;
+        }
+
         return node;
     }
 
@@ -281,8 +317,18 @@ Token *tokenize(char *p)
 
         if ('a' <= *p && *p <= 'z')
         {
-            cur = new_token(TK_IDENT, cur, p++);
-            cur->len = 1;
+            char *q = p;
+            size_t len = 0;
+            while ('a' <= *p && *p <= 'z')
+            {
+                p++;
+                len++;
+            }
+            char *s = (char *)calloc(1, sizeof(char) * len);
+            strncpy(s, q, len);
+
+            cur = new_token(TK_IDENT, cur, s);
+            cur->len = len;
             continue;
         }
 
@@ -298,4 +344,14 @@ Token *tokenize(char *p)
 
     new_token(TK_EOF, cur, p);
     return head.next;
+}
+
+LVar *find_lvar(Token *tok)
+{
+    for (LVar *var = locals; var; var = var->next)
+    {
+        if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
+            return var;
+    }
+    return NULL;
 }
