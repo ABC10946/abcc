@@ -53,4 +53,11 @@ assert 8 "foo=3; bar = 5; foo + bar;"
 assert 5 "a = 3;b = 5 * 6 - 8;(a + b) / 5;"
 assert 5 "foo = 3; bar = 5 * 6 - 8; ( foo + bar) / 5;"
 
+# return テスト
+assert 14 "a=3; b = 5 * 6 - 8; return a + b /2;"
+
+assert 0 "a = 3; a ; return 0;"
+
+assert 33 "a=3; a; return a + 10 * a;"
+
 echo OK

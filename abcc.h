@@ -20,6 +20,7 @@ typedef enum
     ND_GT,     // greater than >
     ND_ASSIGN, // 代入
     ND_LVAR,   // ローカル変数
+    ND_RETURN,
 } NodeKind;
 
 typedef struct Node Node;
@@ -39,7 +40,8 @@ typedef enum
     TK_RESERVED, // 記号
     TK_IDENT,    // 識別子
     TK_NUM,      // 整数
-    TK_EOF       // 終了
+    TK_EOF,      // 終了
+    TK_RETURN,
 } TokenKind;
 
 typedef struct Token Token;
