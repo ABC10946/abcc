@@ -80,8 +80,9 @@ Node *stmt()
             node->rhs = stmt();
             if (token->kind != TK_EOF) {
                 if (token->kind == TK_ELSE) {
-                    node->rhs->lhs = stmt();
                     token = token->next;
+                    Node *tmpNode = node->rhs;
+                    node->rhs = new_node(TK_ELSE, tmpNode, stmt());
                     return node;
                 }
             }
