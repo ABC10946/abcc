@@ -45,8 +45,12 @@ void print_token(Token *tok)
                 tokenKindText = "UNKNOWN";
                 break;
         }
+        if (cur->kind == TK_NUM) {
+            printf("kind: %s, len: %d,  val: %d\n", tokenKindText, cur->len, cur->val);
 
-        printf("kind: %s, len: %d,  str: %s\n", tokenKindText, cur->len, tokentext);
+        } else {
+            printf("kind: %s, len: %d,  str: %s\n", tokenKindText, cur->len, tokentext);
+        }
         cur = cur->next;
     }
 }

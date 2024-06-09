@@ -67,5 +67,9 @@ assert 0 "a=10; a < 10;"
 
 assert 10 "a = 0; while (a < 10) a=a+1; return a;"
 assert 10 "a = 10; while (a < 10) a=a+1; return a;"
+assert 4 "a = 5; if (a == 5) 4;"
+assert 4 "a = 5; if (a == 5) return 4; 12;"
+assert 12 "a = 5; if (a == 1) return 4; 12;"
+assert 12 "a = 5; if (a != 5) return 4; 12;"
 
 echo OK

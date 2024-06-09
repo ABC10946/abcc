@@ -69,6 +69,25 @@ Node *stmt()
             return node;
         }
     }
+    else if (token->kind == TK_IF) {
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_IF;
+        token = token->next;
+        if (consume("("))
+        {
+            node->lhs = expr();
+            expect(")");
+            node->rhs = stmt();
+            if (token->kind != TK_EOF) {
+                if (token->kind == TK_ELSE) {
+                    node->rhs->lhs = stmt();
+                    token = token->next;
+                    return node;
+                }
+            }
+        }
+        return node;
+    }
     else
     {
         node = expr();
