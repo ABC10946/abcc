@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef ABCC_H
+
 typedef enum
 {
     ND_ADD,
@@ -42,6 +44,10 @@ typedef enum
     TK_NUM,      // 整数
     TK_EOF,      // 終了
     TK_RETURN,
+    TK_IF,
+    TK_ELSE,
+    TK_WHILE,
+    TK_FOR,
 } TokenKind;
 
 typedef struct Token Token;
@@ -79,3 +85,7 @@ void gen(Node *node);
 Token *tokenize(char *p);
 Token *consume_ident();
 void program();
+void print_token(Token *token);
+
+#define ABCC_H
+#endif

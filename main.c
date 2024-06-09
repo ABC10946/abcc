@@ -1,5 +1,7 @@
 #include "abcc.h"
 
+#define TOKENTEST 1 // 1: トークンの表示、0: コード生成
+
 char *user_input;
 Token *token;
 
@@ -22,6 +24,14 @@ int main(int argc, char **argv)
 
     user_input = argv[1];
     token = tokenize(user_input);
+
+
+    #if TOKENTEST
+    print_token(token);
+    #endif
+
+
+    #if !TOKENTEST
     program();
 
     printf(".intel_syntax noprefix\n");
@@ -41,5 +51,9 @@ int main(int argc, char **argv)
     printf("\tmov rsp, rbp\n");
     printf("\tpop rbp\n");
     printf("\tret\n");
+
+    #endif
+
     return 0;
+
 }
