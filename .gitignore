@@ -5,3 +5,4 @@ a.out
 abcc
 .gdb_history
 .peda-session-abcc.txt
+.vscode

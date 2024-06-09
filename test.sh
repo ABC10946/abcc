@@ -60,4 +60,12 @@ assert 0 "a = 3; a ; return 0;"
 
 assert 33 "a=3; a; return a + 10 * a;"
 
+assert 1 "a = 0; a = a + 1; return a;"
+assert 43 "a = 42; a = a + 1; return a;"
+
+assert 0 "a=10; a < 10;"
+
+assert 10 "a = 0; while (a < 10) a=a+1; return a;"
+assert 10 "a = 10; while (a < 10) a=a+1; return a;"
+
 echo OK

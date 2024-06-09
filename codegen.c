@@ -39,6 +39,17 @@ void gen(Node *node)
         printf("\tpop rbp\n");
         printf("\tret\n");
         return;
+    case ND_WHILE:
+        labelId++;
+        printf(".Lbegin%d:\n", labelId);
+        gen(node->lhs);
+        printf("\tpop rax\n");
+        printf("\tcmp rax, 0\n");
+        printf("\tje .Lend%d\n", labelId);
+        gen(node->rhs);
+        printf("\tjmp .Lbegin%d\n", labelId);
+        printf(".Lend%d:\n", labelId);
+        return;
     }
 
     gen(node->lhs);

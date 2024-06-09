@@ -1,9 +1,11 @@
 #include "abcc.h"
 
-#define TOKENTEST 1 // 1: トークンの表示、0: コード生成
+#define TOKENVISUALIZE 0 // 1: トークンの表示、0: コード生成
+#define NODEVISUALIZE 1  // 1: ノードの表示、0: コード生成
 
 char *user_input;
 Token *token;
+labelId = 0;
 
 void error(char *fmt, ...)
 {
@@ -26,12 +28,12 @@ int main(int argc, char **argv)
     token = tokenize(user_input);
 
 
-    #if TOKENTEST
+    #if TOKENVISUALIZE
     print_token(token);
     #endif
 
 
-    #if !TOKENTEST
+    #if !TOKENVISUALIZE
     program();
 
     printf(".intel_syntax noprefix\n");
@@ -53,6 +55,7 @@ int main(int argc, char **argv)
     printf("\tret\n");
 
     #endif
+
 
     return 0;
 

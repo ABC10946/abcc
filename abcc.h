@@ -23,6 +23,10 @@ typedef enum
     ND_ASSIGN, // 代入
     ND_LVAR,   // ローカル変数
     ND_RETURN,
+    ND_WHILE,
+    ND_FOR,
+    ND_IF,
+    ND_ELSE,
 } NodeKind;
 
 typedef struct Node Node;
@@ -66,6 +70,7 @@ extern char *user_input;
 // 今見てるトークン
 extern Token *token;
 extern Node *code[100];
+extern int labelId;
 
 // プロトタイプ宣言
 bool consume(char *);
@@ -88,4 +93,5 @@ void program();
 void print_token(Token *token);
 
 #define ABCC_H
+
 #endif
