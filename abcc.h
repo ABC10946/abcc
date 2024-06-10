@@ -24,7 +24,9 @@ typedef enum
     ND_LVAR,   // ローカル変数
     ND_RETURN,
     ND_WHILE,
-    ND_FOR,
+    ND_FOR_HEAD,
+    ND_FOR1,
+    ND_FOR2,
     ND_IF,
     ND_ELSE,
 } NodeKind;

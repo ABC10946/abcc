@@ -82,10 +82,35 @@ Node *stmt()
                 if (token->kind == TK_ELSE) {
                     token = token->next;
                     Node *tmpNode = node->rhs;
-                    node->rhs = new_node(TK_ELSE, tmpNode, stmt());
+                    node->rhs = new_node(ND_ELSE, tmpNode, stmt());
                     return node;
                 }
             }
+        }
+        return node;
+    }
+    else if (token->kind == TK_FOR) {
+        // for (A; B; C) D
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_FOR_HEAD;
+        token = token->next;
+        if (consume("("))
+        {
+            /*
+            if (!memcmp(token->next->str, ";", 1))
+            {
+            }
+            */
+
+           node->lhs = new_node(ND_FOR1, NULL, NULL);
+           node->lhs->lhs = expr(); // A
+           expect(";");
+           node->lhs->rhs = new_node(ND_FOR2, NULL, NULL);
+           node->lhs->rhs->lhs = expr(); // B
+           expect(";");
+           node->lhs->rhs->rhs = expr(); // C
+           expect(")");
+           node->rhs = stmt(); // D
         }
         return node;
     }

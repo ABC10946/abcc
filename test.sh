@@ -73,6 +73,7 @@ assert 12 "a = 5; if (a == 1) return 4; 12;"
 assert 12 "a = 5; if (a != 5) return 4; 12;"
 assert 4 "a = 5; if (a == 5) return 4; else return 12;" 
 assert 12 "a = 9; if (a == 5) return 4; else return 12;" 
-assert 4 "a = 5; if (a == 5) return 4; else return 12;" 
+assert 4 "a = 5; if (a == 5) return 4; else return 12;"
+assert 10 "for(a=0;a < 10; a=a+1) a; return a;"
 
 echo OK

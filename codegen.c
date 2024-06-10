@@ -55,7 +55,7 @@ void gen(Node *node)
         gen(node->lhs);
         printf("\tpop rax\n");
         printf("\tcmp rax, 0\n");
-        if (node->rhs->kind != TK_ELSE) {
+        if (node->rhs->kind != ND_ELSE) {
             printf("\tje .Lend%d\n", labelId);
             gen(node->rhs);
             printf(".Lend%d:\n", labelId);
@@ -66,6 +66,19 @@ void gen(Node *node)
         printf("\tjmp .Lend%d\n", labelId);
         printf(".Lelse%d:\n", labelId);
         gen(node->rhs->rhs);
+        printf(".Lend%d:\n", labelId);
+        return;
+    case ND_FOR_HEAD:
+        labelId++;
+        gen(node->lhs->lhs); // A
+        printf(".Lbegin%d:\n", labelId);
+        gen(node->lhs->rhs->lhs); // B
+        printf("\tpop rax\n");
+        printf("\tcmp rax, 0\n");
+        printf("\tje .Lend%d\n", labelId);
+        gen(node->rhs); // D
+        gen(node->lhs->rhs->rhs); // C
+        printf("\tjmp .Lbegin%d\n", labelId);
         printf(".Lend%d:\n", labelId);
         return;
     }
