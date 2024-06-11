@@ -5,7 +5,7 @@
 
 char *user_input;
 Token *token;
-labelId = 0;
+Stack control_stack;
 
 void error(char *fmt, ...)
 {
@@ -26,6 +26,7 @@ int main(int argc, char **argv)
 
     user_input = argv[1];
     token = tokenize(user_input);
+    stack_init(&control_stack);
 
 
     #if TOKENVISUALIZE

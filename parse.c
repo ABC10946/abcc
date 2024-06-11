@@ -96,21 +96,24 @@ Node *stmt()
         token = token->next;
         if (consume("("))
         {
-            /*
-            if (!memcmp(token->next->str, ";", 1))
-            {
+            node->lhs = new_node(ND_FOR1, NULL, NULL);
+            if (strncmp(token->str, ";", 1) != 0)
+            { 
+                node->lhs->lhs = expr(); // A
             }
-            */
-
-           node->lhs = new_node(ND_FOR1, NULL, NULL);
-           node->lhs->lhs = expr(); // A
-           expect(";");
-           node->lhs->rhs = new_node(ND_FOR2, NULL, NULL);
-           node->lhs->rhs->lhs = expr(); // B
-           expect(";");
-           node->lhs->rhs->rhs = expr(); // C
-           expect(")");
-           node->rhs = stmt(); // D
+            expect(";");
+            node->lhs->rhs = new_node(ND_FOR2, NULL, NULL);
+            if (strncmp(token->str, ";", 1) != 0)
+            { 
+                node->lhs->rhs->lhs = expr(); // B
+            }
+            expect(";");
+            if (strncmp(token->str, ";", 1) != 0)
+            { 
+                node->lhs->rhs->rhs = expr(); // C
+            }
+            expect(")");
+            node->rhs = stmt(); // D
         }
         return node;
     }

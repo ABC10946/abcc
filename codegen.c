@@ -40,46 +40,58 @@ void gen(Node *node)
         printf("\tret\n");
         return;
     case ND_WHILE:
-        labelId++;
-        printf(".Lbegin%d:\n", labelId);
+        stack_push_with_inc(&control_stack);
+        int labelWhileId = stack_get_top(&control_stack);
+        printf(".Lbegin%d:\n", labelWhileId);
         gen(node->lhs);
         printf("\tpop rax\n");
         printf("\tcmp rax, 0\n");
-        printf("\tje .Lend%d\n", labelId);
+        printf("\tje .Lend%d\n", labelWhileId);
         gen(node->rhs);
-        printf("\tjmp .Lbegin%d\n", labelId);
-        printf(".Lend%d:\n", labelId);
+        printf("\tjmp .Lbegin%d\n", labelWhileId);
+        printf(".Lend%d:\n", labelWhileId);
+        stack_pop(&control_stack);
         return;
     case ND_IF:
-        labelId++;
+        stack_push_with_inc(&control_stack);
+        int labelIfId = stack_get_top(&control_stack);
         gen(node->lhs);
         printf("\tpop rax\n");
         printf("\tcmp rax, 0\n");
         if (node->rhs->kind != ND_ELSE) {
-            printf("\tje .Lend%d\n", labelId);
+            printf("\tje .Lend%d\n", labelIfId);
             gen(node->rhs);
-            printf(".Lend%d:\n", labelId);
+            printf(".Lend%d:\n", labelIfId);
             return;
         }
-        printf("\tje .Lelse%d\n", labelId);
+        printf("\tje .Lelse%d\n", labelIfId);
         gen(node->rhs->lhs);
-        printf("\tjmp .Lend%d\n", labelId);
-        printf(".Lelse%d:\n", labelId);
+        printf("\tjmp .Lend%d\n", labelIfId);
+        printf(".Lelse%d:\n", labelIfId);
         gen(node->rhs->rhs);
-        printf(".Lend%d:\n", labelId);
+        printf(".Lend%d:\n", labelIfId);
+        stack_pop(&control_stack);
         return;
     case ND_FOR_HEAD:
-        labelId++;
-        gen(node->lhs->lhs); // A
-        printf(".Lbegin%d:\n", labelId);
-        gen(node->lhs->rhs->lhs); // B
+        stack_push_with_inc(&control_stack);
+        int labelForId = stack_get_top(&control_stack);
+        if (node->lhs->lhs != NULL) {
+            gen(node->lhs->lhs); // A
+        }
+        printf(".Lbegin%d:\n", labelForId);
+        if (node->lhs->rhs->lhs != NULL) {
+            gen(node->lhs->rhs->lhs); // B
+        }
         printf("\tpop rax\n");
         printf("\tcmp rax, 0\n");
-        printf("\tje .Lend%d\n", labelId);
+        printf("\tje .Lend%d\n", labelForId);
         gen(node->rhs); // D
-        gen(node->lhs->rhs->rhs); // C
-        printf("\tjmp .Lbegin%d\n", labelId);
-        printf(".Lend%d:\n", labelId);
+        if (node->lhs->rhs->rhs != NULL) {
+            gen(node->lhs->rhs->rhs); // C
+        }
+        printf("\tjmp .Lbegin%d\n", labelForId);
+        printf(".Lend%d:\n", labelForId);
+        stack_pop(&control_stack);
         return;
     }
 

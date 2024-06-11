@@ -68,11 +68,20 @@ struct Token
     int len;        // トークンの長さ
 };
 
+typedef struct Stack Stack;
+
+struct Stack
+{
+    int stack_array[1000];
+    int stack_num;
+};
+
 extern char *user_input;
 // 今見てるトークン
 extern Token *token;
 extern Node *code[100];
-extern int labelId;
+extern Stack control_stack;
+
 
 // プロトタイプ宣言
 bool consume(char *);
@@ -93,6 +102,12 @@ Token *tokenize(char *p);
 Token *consume_ident();
 void program();
 void print_token(Token *token);
+void stack_init(Stack *stack);
+void stack_push(Stack *stack, int id);
+void stack_push_with_inc(Stack *stack);
+int stack_pop(Stack *stack);
+int stack_get_top(Stack *stack);
+
 
 #define ABCC_H
 
