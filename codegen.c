@@ -81,10 +81,10 @@ void gen(Node *node)
         printf(".Lbegin%d:\n", labelForId);
         if (node->lhs->rhs->lhs != NULL) {
             gen(node->lhs->rhs->lhs); // B
+            printf("\tpop rax\n");
+            printf("\tcmp rax, 0\n");
+            printf("\tje .Lend%d\n", labelForId);
         }
-        printf("\tpop rax\n");
-        printf("\tcmp rax, 0\n");
-        printf("\tje .Lend%d\n", labelForId);
         gen(node->rhs); // D
         if (node->lhs->rhs->rhs != NULL) {
             gen(node->lhs->rhs->rhs); // C
