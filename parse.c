@@ -108,7 +108,7 @@ Node *stmt()
                 node->lhs->rhs->lhs = expr(); // B
             }
             expect(";");
-            if (strncmp(token->str, ";", 1) != 0)
+            if (strncmp(token->str, ")", 1) != 0)
             { 
                 node->lhs->rhs->rhs = expr(); // C
             }

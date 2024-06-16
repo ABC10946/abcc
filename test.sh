@@ -78,5 +78,6 @@ assert 4 "a = 5; if (a == 5) return 4; else return 12;"
 assert 10 "for(a=0;a < 10; a=a+1) a; return a;"
 assert 10 "a=0;for(;a < 10; a=a+1) a; return a;"
 assert 10 "a=0;for(;; a=a+1) if (a == 10) return a;" # たまにテストが落ちる。
+assert 10 "a=0;for(;;) if (a == 10) return a; else a = a + 1;" # たまにテストが落ちる。
 
 echo OK
