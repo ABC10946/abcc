@@ -4,5 +4,6 @@ tmp*
 a.out
 abcc
 .gdb_history
-.peda-session-abcc.txt
+.peda-session-*
+peda-session-*
 .vscode

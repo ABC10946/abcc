@@ -44,6 +44,7 @@ stmt    = expr ";"
         | "while" "(" expr ")" stmt
         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
         | "return" expr ";"
+        | "{" stmt* "}"
 
 */
 Node *stmt()
@@ -114,6 +115,15 @@ Node *stmt()
             }
             expect(")");
             node->rhs = stmt(); // D
+        }
+        return node;
+    }
+    else if (consume("{")) {
+        for (;;)
+        {
+            if (consume("}"))
+                break;
+            node = stmt();
         }
         return node;
     }
@@ -439,7 +449,7 @@ Token *tokenize(char *p)
             continue;
         }
 
-        if (strchr("+-*/()<>=;", *p))
+        if (strchr("+-*/()<>=;{}", *p))
         {
             cur = new_token(TK_RESERVED, cur, p++);
             cur->len = 1;

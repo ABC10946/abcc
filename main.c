@@ -1,7 +1,7 @@
 #include "abcc.h"
 
 #define TOKENVISUALIZE 0 // 1: トークンの表示、0: コード生成
-#define NODEVISUALIZE 1  // 1: ノードの表示、0: コード生成
+#define NODEVISUALIZE 0  // 1: ノードの表示、0: コード生成
 
 char *user_input;
 Token *token;
